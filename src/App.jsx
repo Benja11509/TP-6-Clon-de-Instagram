@@ -1,182 +1,190 @@
-import React, { useState, useEffect } from 'react';  
-import axios from 'axios';  
-import Feed from './components/Feed';  
-import Profile from './components/Profile';  
-import PostDetail from './components/PostDetail';  
-import './App.css';  
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-function App() {  
-  const [posts, setPosts] = useState([]);  
-  const [loading, setLoading] = useState(true);  
-  const [currentView, setCurrentView] = useState('feed');  
-  const [selectedPost, setSelectedPost] = useState(null);  
-  const [likes, setLikes] = useState({});  
-  const [userProfile] = useState({  
-    username: 'gato_enthusiast',  
-    fullName: 'Cat Lover Pro',  
-    avatar: 'https://i.pravatar.cc/150?img=1',  
-    bio: '🐱 Amante de gatos | Fotógrafa de felinos | Buenos Aires, Argentina',  
-    followers: 2450,  
-    following: 856,  
-    postsCount: 124,  
-  });  
+import Feed from './components/Feed';
+import Profile from './components/Profile';
+import PostDetail from './components/PostDetail';
 
-  useEffect(() => {  
-    fetchPosts();  
-  }, []);  
+import './App.css';
 
-  const fetchPosts = async () => {  
-    try {  
-      const postsData = [];  
-      for (let i = 0; i < 12; i++) {  
-        const response = await axios.get(  
-          `https://api.thecatapi.com/v1/images/search?limit=1`  
-        );  
-        const imageData = response.data[0];  
-        postsData.push({  
-          id: imageData.id,  
-          image: imageData.url,  
-          username: `gato_user_${i + 1}`,  
-          caption: `Adorable gatito #${i + 1} 🐱 #gatos #cute #fluffy`,  
-          likes_count: Math.floor(Math.random() * 5000) + 100,  
-          timestamp: new Date(Date.now() - Math.random() * 86400000).toLocaleString('es-AR'),  
-          avatar: `https://i.pravatar.cc/40?img=${i}`,  
-          comments: [  
-            { author: 'usuario1', text: '¡Muy lindo! 😍' },  
-            { author: 'usuario2', text: 'Los gatos son los mejores' },  
-          ],  
-        });  
-      }  
-      setPosts(postsData);  
-      const likesObj = {};  
-      postsData.forEach(post => {  
-        likesObj[post.id] = false;  
-      });  
-      setLikes(likesObj);  
-    } catch (error) {  
-      console.error('Error al obtener imágenes:', error);  
-    } finally {  
-      setLoading(false);  
-    }  
-  };  
+function App() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentView, setCurrentView] = useState('feed');
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [likes, setLikes] = useState({});
 
-  const handlePostClick = (post) => {  
-    setSelectedPost(post);  
-  };  
+  const [userProfile] = useState({
+    username: 'catgram.user',
+    fullName: 'Benjamin Liberman',
+    avatar: 'https://i.pravatar.cc/200?img=12',
+    bio: '🐱 Cat lover | React developer | Photography',
+    followers: '121K',
+    following: '900K',
+    postsCount: 12,
+  });
 
-  const handleLike = (postId) => {  
-    setLikes(prev => ({  
-      ...prev,  
-      [postId]: !prev[postId]  
-    }));  
-  };  
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
-  const closeModal = () => {  
-    setSelectedPost(null);  
-  };  
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get(
+        'https://api.thecatapi.com/v1/images/search?limit=12'
+      );
 
-  return (  
-    <div className="app">  
-      return (
-  <div className="app">
+      const generatedPosts = response.data.map((imageData, index) => ({
+        id: imageData.id,
+        image: imageData.url,
+        username: `cat_user_${index + 1}`,
+        caption: 'Hermoso gatito del día 🐱✨',
+        likes_count: Math.floor(Math.random() * 5000) + 500,
+        timestamp: `${Math.floor(Math.random() * 12) + 1}h`,
+        avatar: `https://i.pravatar.cc/100?img=${index + 20}`,
+        comments: [
+          {
+            author: 'sofia_dev',
+            text: 'Qué lindo 😍',
+          },
+          {
+            author: 'reactlover',
+            text: 'Excelente foto 🔥',
+          },
+        ],
+      }));
 
-    <aside className="sidebar">
+      setPosts(generatedPosts);
 
-      <h1 className="logo">CatGram</h1>
+      const initialLikes = {};
 
-      <ul>
+      generatedPosts.forEach((post) => {
+        initialLikes[post.id] = false;
+      });
 
-        <li onClick={() => setCurrentView('feed')}>
-          <span className="icon">🏠</span>
-          <span>Inicio</span>
-        </li>
+      setLikes(initialLikes);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        <li onClick={() => setCurrentView('profile')}>
-          <span className="icon">👤</span>
-          <span>Perfil</span>
-        </li>
+  const handleLike = (postId) => {
+    setLikes((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
 
-        <li>
-          <span className="icon">🔍</span>
-          <span>Buscar</span>
-        </li>
+  return (
+    <div className="app">
+      {/* SIDEBAR */}
 
-        <li>
-          <span className="icon">❤️</span>
-          <span>Notificaciones</span>
-        </li>
+      <aside className="sidebar">
+        <div>
+          <h1 className="logo">Instagram</h1>
 
-        <li>
-          <span className="icon">➕</span>
-          <span>Crear</span>
-        </li>
+          <div className="profile-card">
+            <img src={userProfile.avatar} alt="" />
 
-      </ul>
+            <h2>{userProfile.fullName}</h2>
 
-    </aside>
+            <p>@{userProfile.username}</p>
 
-    <main className="main-content">
+            <div className="profile-stats-box">
+              <div>
+                <span>{userProfile.followers}</span>
+                <p>Followers</p>
+              </div>
 
-      {loading ? (
+              <div>
+                <span>{userProfile.following}</span>
+                <p>Following</p>
+              </div>
+            </div>
+          </div>
 
-        <div className="loading">
-          <div className="spinner"></div>
-          <p>Cargando publicaciones...</p>
+          <nav className="sidebar-nav">
+            <button
+              className={`nav-item ${currentView === 'feed' ? 'active' : ''}`}
+              onClick={() => setCurrentView('feed')}
+            >
+              🏠 Home
+            </button>
+
+            <button
+              className={`nav-item ${currentView === 'profile' ? 'active' : ''}`}
+              onClick={() => setCurrentView('profile')}
+            >
+              👤 Profile
+            </button>
+
+            <button className="nav-item">🔥 Trending</button>
+            <button className="nav-item">💬 Messages</button>
+            <button className="nav-item">❤️ Notifications</button>
+          </nav>
         </div>
+      </aside>
 
-      ) : currentView === 'feed' ? (
+      {/* MAIN */}
 
-        <Feed
-          posts={posts}
-          onPostClick={handlePostClick}
-          onLike={handleLike}
-          likes={likes}
-        />
+      <main className="main-content">
+        {/* TOPBAR */}
 
-      ) : (
+        <header className="topbar">
+          <input
+            type="text"
+            placeholder="Search users, hashtags and stories"
+          />
 
-        <Profile
-          userProfile={userProfile}
-          posts={posts}
-        />
+          <div className="topbar-actions">
+            <button>⚙️</button>
+            <button>📷</button>
+            <button>✈️</button>
+            <button className="new-post-btn">+ New Post</button>
+          </div>
+        </header>
 
-      )}
+        {/* STORIES */}
 
-    </main>
+        <section className="stories-section">
+          <h2>STORIES</h2>
 
-    {selectedPost && (
-      <PostDetail
-        post={selectedPost}
-        onClose={closeModal}
-        onLike={handleLike}
-        isLiked={likes[selectedPost.id]}
-      />
-    )}
+          <div className="stories-container">
+            {posts.slice(0, 7).map((post) => (
+              <div key={post.id} className="story">
+                <img src={post.image} alt="" />
+                <p>@{post.username}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-  </div>
-);
+        {/* FEED */}
 
-      <main className="main-content">  
-        {loading ? (  
-          <div className="loading">  
-            <div className="spinner"></div>  
-            <p>Cargando publicaciones...</p>  
-          </div>  
-        ) : currentView === 'feed' ? (  
-          <Feed  
-            posts={posts}  
-            onPostClick={handlePostClick}  
-            onLike={handleLike}  
-            likes={likes}  
-          />  
-        ) : (  
-          <Profile userProfile={userProfile} posts={posts} />  
-        )}  
+        {loading ? (
+          <div className="loading-screen">
+            <div className="spinner"></div>
+          </div>
+        ) : currentView === 'feed' ? (
+          <Feed
+            posts={posts}
+            onPostClick={setSelectedPost}
+            onLike={handleLike}
+            likes={likes}
+          />
+        ) : (
+          <Profile userProfile={userProfile} posts={posts} />
+        )}
       </main>
-            {selectedPost && (
+
+      {/* MODAL */}
+
+      {selectedPost && (
         <PostDetail
           post={selectedPost}
-          onClose={closeModal}
+          onClose={() => setSelectedPost(null)}
           onLike={handleLike}
           isLiked={likes[selectedPost.id]}
         />

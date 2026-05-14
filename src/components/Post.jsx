@@ -1,66 +1,117 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const Post = ({ post, onPostClick, onLike, isLiked }) => {
-  const handleLikeClick = (e) => {
-    e.stopPropagation();
-    onLike(post.id);
+function Post({ post, onPostClick, onLike, isLiked }) {
+
+  const [comments, setComments] = useState(post.comments || []);
+  const [newComment, setNewComment] = useState('');
+
+  const addComment = () => {
+
+    if(newComment.trim() === '') return;
+
+    const comment = {
+      author: 'benjamin_user',
+      text: newComment
+    };
+
+    setComments([...comments, comment]);
+    setNewComment('');
   };
 
   return (
-    <article className="post" onClick={() => onPostClick(post)}>
+    <div className="post">
+
+      {/* HEADER */}
+
       <div className="post-header">
+
         <div className="post-user-info">
-          <img src={post.avatar} alt={post.username} className="post-avatar" />
-          <div className="user-details">
-            <p className="username">{post.username}</p>
-            <p className="timestamp">{post.timestamp}</p>
+
+          <img src={post.avatar} alt="" />
+
+          <div className="post-user-data">
+            <span className="post-user">{post.username}</span>
+            <span className="post-date">{post.timestamp}</span>
           </div>
+
         </div>
-        <button className="more-options">⋯</button>
+
       </div>
 
-      <div className="post-image-container">
-        <img src={post.image} alt="Post" className="post-image" />
-      </div>
+      {/* IMAGE */}
+
+      <img
+        src={post.image}
+        alt=""
+        className="post-image"
+        onClick={() => onPostClick(post)}
+      />
+
+      {/* ACTIONS */}
 
       <div className="post-actions">
-        <button
-          className={`action-btn like-btn ${isLiked ? 'liked' : ''}`}
-          onClick={handleLikeClick}
-          title="Like"
-        >
-          {isLiked ? '❤️' : '🤍'}
-        </button>
-        <button className="action-btn" title="Comment">
-          💬
-        </button>
-        <button className="action-btn" title="Share">
-          📤
-        </button>
-        <button className="action-btn save-btn" title="Save">
-          🔖
-        </button>
+
+        <div className="post-left-actions">
+
+          <button onClick={() => onLike(post.id)}>
+            {isLiked ? '❤️' : '🤍'}
+          </button>
+
+          <button>💬</button>
+
+          <button>✈️</button>
+
+        </div>
+
+        <button>🔖</button>
+
       </div>
 
-      <div className="post-stats">
-        <p className="likes-count">{isLiked ? post.likes_count + 1 : post.likes_count} likes</p>
-      </div>
+      {/* CONTENT */}
 
       <div className="post-content">
-        <p className="caption">
-          <span className="username-inline">{post.username}</span> {post.caption}
-        </p>
+
+        <div className="likes">
+          {post.likes_count} likes
+        </div>
+
+        <div className="caption">
+          <strong>{post.username}</strong> {post.caption}
+        </div>
+
+        {/* COMMENTS */}
+
+        <div className="comments">
+
+          {comments.map((comment, index) => (
+            <div key={index} className="comment">
+              <strong>{comment.author}</strong> {comment.text}
+            </div>
+          ))}
+
+        </div>
+
+        {/* ADD COMMENT */}
+
+        <div className="comment-box">
+
+          <input
+            type="text"
+            placeholder="Add a comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+          />
+
+          <button onClick={addComment}>
+            Post
+          </button>
+
+        </div>
+
       </div>
 
-      <div className="post-comments">
-        {post.comments && post.comments.slice(0, 2).map((comment, index) => (
-          <p key={index} className="comment">
-            <span className="comment-author">{comment.author}</span> {comment.text}
-          </p>
-        ))}
-      </div>
-    </article>
+    </div>
   );
-};
+}
 
 export default Post;
